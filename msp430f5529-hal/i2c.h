@@ -73,6 +73,15 @@ typedef enum {
 	HAL_I2C_ERROR_BTF_TIMEOUT,
 	HAL_I2C_ERROR_NULL_HANDLE
 } hal_i2c_status;
+
+/**
+ * @brief i2c conditions.
+ */
+typedef enum {
+    HAL_I2C_STOP = 0,
+    HAL_I2C_START
+} hal_i2c_condition;
+
 /**
  * @brief This type is a map of the USCI_Bx i2c registers.
  */
@@ -183,6 +192,13 @@ hal_i2c_status hal_i2c_master_write(hal_i2c_handle * handle, uint16_t addr, uint
  * @param len number of characters to read
  */
 hal_i2c_status hal_i2c_master_read(hal_i2c_handle * handle, uint16_t addr, uint8_t *ptr, int len);
+
+/**
+ * @brief Signals specific i2c bus events 
+ * @param handle i2c bus handle to send to 
+ * @param condition i2c condition to trigger
+ */
+hal_i2c_status hal_i2c_send_condition(hal_i2c_handle * handle, hal_i2c_condition condition);
 
 #endif
 #endif
