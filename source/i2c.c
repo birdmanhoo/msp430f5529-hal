@@ -357,4 +357,43 @@ hal_i2c_status hal_i2c_master_read(hal_i2c_handle * handle, uint16_t addr, uint8
 	return ret;
 }
 
+
+hal_i2c_status hal_i2c_send_condition(hal_i2c_handle * handle, hal_i2c_condition condition)
+{
+    /* if bad pointer */
+    if(handle == NULL)
+        return HAL_I2C_ERROR_NULL_HANDLE; /* error */
+
+    /* return variable */
+    hal_i2c_status ret = HAL_I2C_ERROR;
+    
+    switch(condition)
+    {
+        case  HAL_I2C_STOP:
+        /* set I2C stop condition */
+        handle->reg->control1 |= UCTXSTP;
+        /* wait for STP to clear */
+        if((ret = hal_i2c_register_timeout(handle, UCTXSTP, RELEASE)) != HAL_I2C_OK)
+        {
+            return ret; /* error */
+        }
+
+        case  HAL_I2C_START:
+        /* set I2C start condition */
+    	handle->reg->control1 |= UCTXSTT;
+        /* wait for STT to clear */
+		if((ret = hal_i2c_register_timeout(handle, UCTXSTT, RELEASE)) != HAL_I2C_OK)
+		{
+			/* trigger a stop condition */
+			handle->reg->control1 |= UCTXSTP;
+			hal_i2c_register_timeout(handle, UCTXSTP, RELEASE);
+
+			return ret; /* error */
+		}
+        default: return ret;
+    }
+    /* return status */
+	return ret;
+}
+
 #endif
